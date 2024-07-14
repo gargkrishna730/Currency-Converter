@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("/static/currency.jpg");
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #333;
+        }
+        .reset {
+            background-color: #fff;
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+        .reset:hover {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Currency Converter</h1>
+        <form id="converter-form" onreset="clearResult()">
+            <label for="amount">Amount:</label>
+            <input type="text" id="amount" name="amount" placeholder="Enter amount"><br>
+
+            <label for="from_currency">From:</label>
+            <select id="from_currency" name="from_currency">
+                <option value="INR">India - INR</option>
+                <option value="USD">United States - USD</option>
+                <option value="CAD">Canada - CAD</option>
+                <option value="CNY">China - CNY</option>
+                <option value="DKK">Denmark - DKK</option>
+                <option value="EUR">European Union - EUR</option>
+                <option value="GBP">United Kingdom - GBP</option>
+                <option value="IDR">Indonesia - IDR</option>
+                <option value="JPY">Japan - JPY</option>
+                <option value="BGN">Bulgaria - BGN</option>
+                <option value="ILS">Israel - ILS</option>
+                <option value="HUF">Hungary - HUF</option>
+                <option value="RON">Romania - RON</option>
+                <option value="MYR">Malaysia - MYR</option>
+                <option value="SEK">Sweden - SEK</option>
+                <option value="SGD">Singapore - SGD</option>
+                <option value="HKD">Hong Kong - HKD</option>
+                <option value="AUD">Australia - AUD</option>
+                <option value="CHF">Switzerland - CHF</option>
+                <option value="KRW">South Korea - KRW</option>
+                <option value="TRY">Turkey - TRY</option>
+                <option value="HRK">Croatia - HRK</option>
+                <option value="NZD">New Zealand - NZD</option>
+                <option value="THB">Thailand - THB</option>
+                <option value="NOK">Norway - NOK</option>
+                <option value="RUB">Russia - RUB</option>
+                <option value="MXN">Mexico - MXN</option>
+                <option value="CZK">Czech Republic - CZK</option>
+                <option value="BRL">Brazil - BRL</option>
+                <option value="PLN">Poland - PLN</option>
+                <option value="PHP">Philippines - PHP</option>
+                <option value="ZAR">South Africa - ZAR</option>
+            </select><br>
+
+            <label for="to_currency">To:</label>
+            <select id="to_currency" name="to_currency">
+                <option value="INR">India - INR</option>
+                <option value="USD">United States - USD</option>
+                <option value="CAD">Canada - CAD</option>
+                <option value="CNY">China - CNY</option>
+                <option value="DKK">Denmark - DKK</option>
+                <option value="EUR">European Union - EUR</option>
+                <option value="GBP">United Kingdom - GBP</option>
+                <option value="IDR">Indonesia - IDR</option>
+                <option value="JPY">Japan - JPY</option>
+                <option value="BGN">Bulgaria - BGN</option>
+                <option value="ILS">Israel - ILS</option>
+                <option value="HUF">Hungary - HUF</option>
+                <option value="RON">Romania - RON</option>
+                <option value="MYR">Malaysia - MYR</option>
+                <option value="SEK">Sweden - SEK</option>
+                <option value="SGD">Singapore - SGD</option>
+                <option value="HKD">Hong Kong - HKD</option>
+                <option value="AUD">Australia - AUD</option>
+                <option value="CHF">Switzerland - CHF</option>
+                <option value="KRW">South Korea - KRW</option>
+                <option value="TRY">Turkey - TRY</option>
+                <option value="HRK">Croatia - HRK</option>
+                <option value="NZD">New Zealand - NZD</option>
+                <option value="THB">Thailand - THB</option>
+                <option value="NOK">Norway - NOK</option>
+                <option value="RUB">Russia - RUB</option>
+                <option value="MXN">Mexico - MXN</option>
+                <option value="CZK">Czech Republic - CZK</option>
+                <option value="BRL">Brazil - BRL</option>
+                <option value="PLN">Poland - PLN</option>
+                <option value="PHP">Philippines - PHP</option>
+                <option value="ZAR">South Africa - ZAR</option>
+            </select><br>
+
+            <button type="button" onclick="convertCurrency()">Convert</button>
+            <button type="reset" class="reset">Reset</button>
+        </form>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function convertCurrency() {
+            var form = document.getElementById('converter-form');
+            var formData = new FormData(form);
+
+            fetch('/convert', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerText = data.error;
+                } else {
+                    document.getElementById('result').innerText = 'Converted Amount: ' + data.result;
+                }
+            });
+        }
+
+        function clearResult() {
+            document.getElementById('result').innerText = '';
+        }
+    </script>
+</body>
+</html>
