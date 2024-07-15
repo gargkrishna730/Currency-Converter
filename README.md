@@ -19,7 +19,7 @@ A simple currency converter web application built with Flask. This app allows us
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/gargkrishna730/Currency-Converter-Revamp.git
+    git clone https://github.com/gargkrishna730/Currency-Converter.git
     cd currency-converter
     ```
 
