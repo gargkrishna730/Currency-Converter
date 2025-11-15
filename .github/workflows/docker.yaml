@@ -26,7 +26,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ needs.docker_build_and_push.outputs.docker_tag_date }}
   
   deploy_to_kubernetes:
     needs: docker_build_and_push
