@@ -26,7 +26,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ needs.docker_build_and_push.outputs.docker_tag_date }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
   
   deploy_to_kubernetes:
     needs: docker_build_and_push
@@ -49,7 +49,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Update deployment image
         run: |
-          kubectl set image deployment/my-app-deployment my-app-container=${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
+          kubectl set image deployment/my-app-deployment my-app-container=${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ needs.docker_build_and_push.outputs.docker_tag_date }}
 
       - name: Verify deployment
         run: |
