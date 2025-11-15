@@ -6,6 +6,8 @@ on:
 jobs:
   docker_build_and_push:
     runs-on: ubuntu-latest
+    outputs:
+      docker_tag_date: ${{ steps.set_env.outputs.DOCKER_TAG_DATE }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
