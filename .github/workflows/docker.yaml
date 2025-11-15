@@ -32,16 +32,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      
+      - name: authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          version: 'latest'
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Configure kubectl
-        run: |
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-
+      - name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+          location: ${{ secrets.GKE_CLUSTER_LOCATION }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Update deployment image
         run: |
           kubectl set image deployment/my-app-deployment my-app-container=${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
