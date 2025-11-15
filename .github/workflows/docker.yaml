@@ -25,3 +25,27 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
+  
+  deploy_to_kubernetes:
+    needs: docker_build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+
+      - name: Update deployment image
+        run: |
+          kubectl set image deployment/my-app-deployment my-app-container=${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/my-app-deployment

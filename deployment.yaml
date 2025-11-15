@@ -14,11 +14,9 @@ spec:
     spec:
       containers:
       - name: my-app-container
-        image: sunildocker.azurecr.io/currency-converter:v2
+        image: gargkrishna730/currencyconverter:20251113-164922
         ports:
         - containerPort: 5000
-      imagePullSecrets:
-      - name: acr-secret
 
 ---
 apiVersion: v1
