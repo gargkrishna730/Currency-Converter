@@ -7,7 +7,7 @@ jobs:
   docker_build_and_push:
     runs-on: ubuntu-latest
     outputs:
-      docker_tag_date: ${{ steps.set_env.outputs.DOCKER_TAG_DATE }}
+      DOCKER_TAG_DATE: ${{ steps.set_env.outputs.DOCKER_TAG_DATE }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Update deployment image
         run: |
-          kubectl set image deployment/my-app-deployment my-app-container=${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ needs.docker_build_and_push.outputs.docker_tag_date }}
+          kubectl set image deployment/my-app-deployment my-app-container=${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ needs.docker_build_and_push.outputs.DOCKER_TAG_DATE }}
 
       - name: Verify deployment
         run: |
