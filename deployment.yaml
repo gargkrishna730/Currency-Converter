@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: my-app-container
-        image: gargkrishna730/currencyconverter:20251113-164922
+        image: gargkrishna730/currencyconverter:multi-arch
         ports:
         - containerPort: 5000
 
