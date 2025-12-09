@@ -31,3 +31,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }}
+      
+      - name: Summary of Docker Build and Push
+        run: |
+          echo "Docker image ${{ secrets.DOCKER_HUB_USERNAME }}/currencyconverter:${{ env.DOCKER_TAG_DATE }} has been built and pushed successfully." >> $GITHUB_STEP_SUMMARY
