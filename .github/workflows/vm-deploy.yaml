@@ -34,17 +34,16 @@ jobs:
       - name: 📝 Format Commit Message
         id: format_commits
         run: |
-          cd repo
-          # Get only the current commit message
-          commit_message=$(git log -1 --pretty=format:"%s")
-          echo "FORMATTED_MESSAGES=* ${commit_message}" >> $GITHUB_ENV
+          commit_message=$(git -C "$GITHUB_WORKSPACE" log -1 --pretty=format:%s)
+          echo "FORMATTED_MESSAGES=* ${commit_message}" >> "$GITHUB_ENV"
 
       - name: 📧 Send Deployment Success Email
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
-          server_port: 587
+          server_port: 465
+          secure: true
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "🚀 Currency Converter Deployment Successful - ${{ github.repository }}"
@@ -77,7 +76,8 @@ jobs:
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
-          server_port: 587
+          server_port: 465
+          secure: true
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "🚨 Currency Converter Deployment Failed - ${{ github.repository }}"
