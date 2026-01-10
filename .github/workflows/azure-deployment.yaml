@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 jobs:
   docker_build_and_push:
     runs-on: ubuntu-latest
