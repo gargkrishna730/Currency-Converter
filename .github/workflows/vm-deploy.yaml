@@ -1,0 +1,102 @@
+name: Python App on EC2
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy_to_ec2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: SSH into EC2
+        run: |
+            ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+                cd /opt/currencyconverter
+                source venv/bin/activate
+                git pull origin main
+                pip install -r requirements.txt
+                sudo systemctl restart currencyconverter.service
+            EOF
+
+      - name: Verify deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+            sudo systemctl status currencyconverter.service
+          EOF
+
+      - name: 📝 Format Commit Message
+        id: format_commits
+        run: |
+          cd repo
+          # Get only the current commit message
+          commit_message=$(git log -1 --pretty=format:"%s")
+          echo "FORMATTED_MESSAGES=* ${commit_message}" >> $GITHUB_ENV
+
+      - name: 📧 Send Deployment Success Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚀 Currency Converter Deployment Successful - ${{ github.repository }}"
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: Currency Converter CI/CD <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <h2>🚀 Currency Converter Deployment Successful</h2>
+            <p>Your Currency Converter site has been successfully deployed.</p>
+
+            <h3>📝 Latest Change:</h3>
+            <ul>
+              <li><strong>Commit Message:</strong><br> ${{ env.FORMATTED_MESSAGES }}</li>
+              <li><strong>Commit Hash:</strong> <a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"><code>${{ github.sha }}</code></a></li>
+              <li><strong>Branch:</strong> ${{ github.ref_name }}</li>
+              <li><strong>Repository:</strong> <a href="https://github.com/${{ github.repository }}">${{ github.repository }}</a></li>
+              <li><strong>Site URL:</strong> <a href="https://currencyconverter.krishnagarg.online">https://currencyconverter.krishnagarg.online</a></li>
+            </ul>
+
+            <h3>🔗 Quick Links:</h3>
+            <ul>
+              <li><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow Run Logs</a></li>
+              <li><a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}">View Commit on GitHub</a></li>
+            </ul>
+
+            <hr>
+            <p style="font-size: small; color: gray;">This is an automated message from the Currency Converter CI/CD pipeline.</p>
+            
+      - name: ⚠️ Send Deployment Failure Email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚨 Currency Converter Deployment Failed - ${{ github.repository }}"
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: Currency Converter CI/CD <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <h2>🚨 Currency Converter Deployment Failed</h2>
+            <p>The deployment of your Currency Converter site has failed. Please review the logs for more details.</p>
+
+            <h3>📝 Deployment Details:</h3>
+            <ul>
+              <li><strong>Commit Messages:</strong><br> ${{ env.FORMATTED_MESSAGES }}</li>
+              <li><strong>Commit Hash:</strong> <a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"><code>${{ github.sha }}</code></a></li>
+              <li><strong>Branch:</strong> ${{ github.ref_name }}</li>
+              <li><strong>Repository:</strong> <a href="https://github.com/${{ github.repository }}">${{ github.repository }}</a></li>
+            </ul>
+
+            <h3>🔍 Troubleshooting</h3>
+            <p>View the <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">GitHub Actions logs</a> for details on the failure.</p>
+
+            <hr>
+            <p style="font-size: small; color: gray;">This is an automated message from the Currency Converter CI/CD pipeline.</p>
