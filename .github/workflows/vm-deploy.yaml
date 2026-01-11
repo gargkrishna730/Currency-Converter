@@ -22,12 +22,13 @@ jobs:
                 source venv/bin/activate
                 git pull origin main
                 pip install -r requirements.txt
-                sudo systemctl restart currencyconverter.service
             EOF
 
       - name: Verify deployment
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+            sudo systemctl daemon-reload
+            sudo systemctl restart currencyconverter.service
             sudo systemctl status currencyconverter.service
           EOF
 
