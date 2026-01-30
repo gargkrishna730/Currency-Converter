@@ -13,7 +13,18 @@ docker buildx build --platform linux/amd64,linux/arm64 -t <REGISTRY_URL>/<REPOSI
 az login
 ```
 
-### 2. Create App Service Plan
+### 2. Create Resource Group
+```bash
+az group create --name <resource-group-name> --location <location>
+```
+
+### Example
+```bash
+az group create --name jaspreet --location East US 
+
+```
+
+### 3. Create App Service Plan
 ```bash
 az appservice plan create --name <app-service-plan-name> --resource-group <resource-group-name> --sku S1 --is-linux
 ```
@@ -23,7 +34,7 @@ az appservice plan create --name <app-service-plan-name> --resource-group <resou
 az appservice plan create --name app-service-container --resource-group gpu-poc --sku F1 --is-linux
 ```
 
-### 3. Create App Service
+### 4. Create App Service
 ```bash
 az webapp create --name <app-name> --resource-group <resource-group-name> --plan <app-service-plan-name> --deployment-container-image-name <image-name-and-tag>
 ```
